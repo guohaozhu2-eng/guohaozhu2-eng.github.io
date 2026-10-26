@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>朱国昊 — 资深关卡策划</title>
+    <meta name="description" content="朱国昊，腾讯 P9 资深关卡策划，7 年射击与动作游戏关卡设计经验，精通 PVP 关卡与模式设计。">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #1d1d1f;
+            --white: #ffffff;
+            --gray-50: #f5f5f7;
+            --gray-100: #e8e8ed;
+            --gray-200: #d2d2d7;
+            --gray-400: #86868b;
+            --gray-600: #6e6e73;
+            --blue: #0071e3;
+            --blue-hover: #0077ed;
+            --radius-lg: 24px;
+            --radius-md: 18px;
+            --radius-sm: 12px;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+            --transition: 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            color: var(--black);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ===== 毛玻璃导航 ===== */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 9999;
+            height: 52px;
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .nav-inner {
+            max-width: 1024px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--black);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--black); }
+
+        /* ===== Hero ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            background: var(--gray-50);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -40%; left: -20%;
+            width: 140%; height: 140%;
+            background: radial-gradient(ellipse at 50% 50%, rgba(0,113,227,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--blue);
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+            position: relative; z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 7vw, 80px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.05;
+            margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+
+        .hero-sub {
+            font-size: clamp(17px, 2.2vw, 24px);
+            color: var(--gray-600);
+            max-width: 620px;
+            line-height: 1.4;
+            margin-bottom: 36px;
+            position: relative; z-index: 1;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            gap: 16px;
+            position: relative; z-index: 1;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 28px;
+            border-radius: 980px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary { background: var(--blue); color: var(--white); }
+        .btn-primary:hover { background: var(--blue-hover); }
+        .btn-outline { color: var(--blue); border: 1px solid var(--blue); }
+        .btn-outline:hover { background: rgba(0,113,227,0.05); }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-400);
+            font-size: 12px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* ===== Section ===== */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 24px;
+        }
+
+        .section-alt { background: var(--gray-50); }
+
+        .section-dark { background: var(--black); color: var(--white); }
+        .section-dark .section-label { color: rgba(255,255,255,0.5); }
+        .section-dark .section-title { color: var(--white); }
+        .section-dark .section-desc { color: rgba(255,255,255,0.7); }
+
+        .section-inner { max-width: 980px; width: 100%; }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .section-desc {
+            font-size: clamp(15px, 1.8vw, 19px);
+            color: var(--gray-600);
+            max-width: 620px;
+            line-height: 1.6;
+            margin-bottom: 56px;
+        }
+
+        /* ===== About ===== */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .about-bio p {
+            font-size: 17px;
+            line-height: 1.75;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius-md);
+            padding: 28px 24px;
+            text-align: center;
+            transition: all var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: -0.02em;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .info-list {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            font-size: 15px;
+            color: var(--gray-600);
+            align-items: baseline;
+        }
+
+        .info-row .k {
+            color: var(--gray-400);
+            min-width: 64px;
+            font-size: 13px;
+        }
+
+        /* ===== Timeline ===== */
+        .timeline { position: relative; }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 32px;
+            padding: 32px 0;
+            border-bottom: 1px solid var(--gray-100);
+            transition: all var(--transition);
+        }
+
+        .timeline-item:last-child { border-bottom: none; }
+        .timeline-item:hover { padding-left: 12px; }
+
+        .timeline-year {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--blue);
+            letter-spacing: 0.02em;
+            padding-top: 2px;
+        }
+
+        .timeline-content h3 {
+            font-size: 21px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .timeline-content .company {
+            font-size: 14px;
+            color: var(--gray-400);
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .timeline-content ul { list-style: none; padding: 0; }
+
+        .timeline-content li {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.7;
+            padding-left: 18px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .timeline-content li::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 9px;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--gray-200);
+        }
+
+        /* ===== Projects ===== */
+        .projects-scroll {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            padding: 8px 0 32px;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+        }
+
+        .projects-scroll::-webkit-scrollbar { height: 4px; }
+        .projects-scroll::-webkit-scrollbar-track { background: transparent; }
+        .projects-scroll::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+
+        .project-card {
+            flex: 0 0 360px;
+            scroll-snap-align: start;
+            background: var(--white);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
+
+        .project-visual {
+            height: 220px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-50);
+        }
+
+        .project-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .project-card:hover .project-visual img { transform: scale(1.04); }
+
+        .project-info { padding: 24px; }
+
+        .project-info .proj-meta {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            margin-bottom: 8px;
+        }
+
+        .project-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .project-info p {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.65;
+            margin-bottom: 16px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-tags span {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 980px;
+            background: var(--gray-50);
+            color: var(--gray-600);
+            border: 1px solid var(--gray-100);
+        }
+
+        /* ===== Methodology ===== */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .method-card {
+            background: var(--white);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .method-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.07);
+        }
+
+        .method-thumb {
+            height: 260px;
+            overflow: hidden;
+            background: var(--gray-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .method-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 16px;
+        }
+
+        .method-body { padding: 24px 28px 28px; }
+
+        .method-body h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .method-body p {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.7;
+        }
+
+        /* lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(0,0,0,0.85);
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            cursor: zoom-out;
+        }
+
+        .lightbox.open { display: flex; }
+
+        .lightbox img {
+            max-width: 92%;
+            max-height: 92%;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* ===== Skills ===== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: var(--white);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius-md);
+            padding: 32px 28px;
+            transition: all var(--transition);
+        }
+
+        .skill-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+
+        .skill-icon { font-size: 32px; margin-bottom: 16px; }
+
+        .skill-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .skill-card p {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* ===== Contact ===== */
+        .contact-section { text-align: center; background: var(--gray-50); }
+        .contact-section .section-title { margin-bottom: 12px; }
+        .contact-section .section-desc {
+            margin-left: auto; margin-right: auto; margin-bottom: 40px;
+        }
+
+        .contact-cards {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            background: var(--white);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--black);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .contact-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 4px 16px rgba(0,113,227,0.1);
+        }
+
+        .contact-card .icon { font-size: 18px; }
+
+        /* ===== Footer ===== */
+        .footer {
+            padding: 32px 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray-400);
+            border-top: 1px solid var(--gray-100);
+        }
+
+        /* ===== Reveal ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .nav-links { gap: 18px; }
+            .nav-links a { font-size: 11px; }
+            .about-grid { grid-template-columns: 1fr; gap: 32px; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .method-grid { grid-template-columns: 1fr; }
+            .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+            .project-card { flex: 0 0 300px; }
+            .section { padding: 100px 20px; min-height: auto; }
+            .hero { min-height: 90vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 导航 ===== -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">朱国昊</a>
+            <ul class="nav-links">
+                <li><a href="#about">关于</a></li>
+                <li><a href="#experience">履历</a></li>
+                <li><a href="#projects">项目</a></li>
+                <li><a href="#method">方法论</a></li>
+                <li><a href="#skills">能力</a></li>
+                <li><a href="#contact">联系</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+        <div class="hero-eyebrow reveal">资深关卡策划 · 腾讯 P9</div>
+        <h1 class="reveal reveal-delay-1">朱国昊</h1>
+        <p class="hero-sub reveal reveal-delay-2">7 年射击与动作游戏关卡策划经验，精通 PVP 关卡与模式设计，致力于打造让人上瘾的竞技体验。</p>
+        <div class="hero-cta reveal reveal-delay-3">
+            <a href="#contact" class="btn btn-primary">联系我 →</a>
+            <a href="#projects" class="btn btn-outline">查看项目</a>
+        </div>
+        <div class="scroll-hint">
+            <span>向下滚动</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 6l4 4 4-4"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ===== 关于我 ===== -->
+    <section class="section" id="about">
+        <div class="section-inner">
+            <div class="section-label reveal">关于</div>
+            <h2 class="section-title reveal reveal-delay-1">一个专注竞技关卡的设计者</h2>
+            <div class="about-grid" style="margin-top: 20px;">
+                <div class="about-bio reveal reveal-delay-2">
+                    <p>我是一名拥有 7 年经验的关卡策划，先后任职于腾讯与网易，深度参与射击（FPS/TPS）与动作（ACT）游戏的 PVP 关卡与模式设计。</p>
+                    <p>从《暗区突围》的 PVPVE 地图，到《漫威争锋》的全球化 PVP 地图，再到《王者荣耀世界》的 ACT 竞技玩法，我完整经历过关卡从前期设计、白模搭建、跑测调整到生产制作的全流程，擅长在战斗乐趣与关卡可信度之间寻找平衡。</p>
+                    <div class="info-list">
+                        <div class="info-row"><span class="k">学历</span><span>浙江大学 · 电气工程（本科）</span></div>
+                        <div class="info-row"><span class="k">岗位</span><span>关卡策划 · 腾讯 P9</span></div>
+                        <div class="info-row"><span class="k">绩效</span><span>网易绩效 A 以上（前 30%）· 腾讯连续两次 Outstanding</span></div>
+                        <div class="info-row"><span class="k">爱好</span><span>COD / 战地 / 命运2 / 永劫无间 / GTA · PVP 爱好者</span></div>
+                    </div>
+                </div>
+                <div class="about-stats reveal reveal-delay-3">
+                    <div class="stat-card">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">年关卡策划经验</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">P9</div>
+                        <div class="stat-label">腾讯资深职级</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">款主力项目</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">A+</div>
+                        <div class="stat-label">历年绩效表现</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 工作履历 ===== -->
+    <section class="section section-alt" id="experience">
+        <div class="section-inner">
+            <div class="section-label reveal">履历</div>
+            <h2 class="section-title reveal reveal-delay-1">职业经历</h2>
+            <p class="section-desc reveal reveal-delay-2">从 FPS 到 ACT，覆盖射击与动作游戏的完整关卡设计链路。</p>
+            <div class="timeline">
+
+                <div class="timeline-item reveal reveal-delay-1">
+                    <div class="timeline-year">2024 — 至今</div>
+                    <div class="timeline-content">
+                        <h3>关卡策划</h3>
+                        <div class="company">腾讯 · 王者荣耀世界（ACT / UE4）</div>
+                        <ul>
+                            <li>从零建立 PVP 关卡的生产规范与管线流程，制定关卡设计标准，生产模块化场景资源</li>
+                            <li>设计制作吃鸡玩法地图「王者峡谷」，负责龙坑、红 buff 等 POI 的 2D layout 设计与 3D 场景制作</li>
+                            <li>设计制作 4V4 竞技玩法的模式规则与地图场景，跟进生产制作与 CE，打磨玩家体验</li>
+                            <li>预研搜打撤玩法与类黑夜君临 PVE 肉鸽玩法，目前推进平台期 PVE 玩法</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal reveal-delay-2">
+                    <div class="timeline-year">2021 — 2024</div>
+                    <div class="timeline-content">
+                        <h3>关卡特性组负责人</h3>
+                        <div class="company">网易 · 漫威争锋（TPS / UE5）</div>
+                        <ul>
+                            <li>负责两张 PVP 地图「阿斯加德」与「纽约」的前期设计、白模搭建、跑测调整与生产制作</li>
+                            <li>负责场景破碎相关玩法设计与关卡结构设计，制定破碎资源生产管线规范</li>
+                            <li>进行原创玩法模式的设计制作与玩法推演，制定模式参数标准与地图尺寸标准</li>
+                            <li>与海外策划团队沟通协作，进行协作设计与关卡规范整理</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal reveal-delay-3">
+                    <div class="timeline-year">2020 — 2021</div>
+                    <div class="timeline-content">
+                        <h3>关卡策划</h3>
+                        <div class="company">腾讯 · 暗区突围（FPS / UE4）</div>
+                        <ul>
+                            <li>参与两张 PVPVE 地图「山谷」与「军械库」的前期设计、地形与结构搭建、跑测调整与生产制作</li>
+                            <li>设计局内局外任务系统，搭建任务编辑器，与外围成长目标配合，提供游戏长线追求</li>
+                            <li>整合局内资源、任务、地形信息，优化玩家体验，降低上手门槛</li>
+                            <li>配置地图资源、布置 AI 与可拾取物，负责新手关与新手温暖局的设计制作</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal reveal-delay-4">
+                    <div class="timeline-year">2019 — 2020</div>
+                    <div class="timeline-content">
+                        <h3>关卡策划</h3>
+                        <div class="company">腾讯 · 王牌战士（FPS / Unity）</div>
+                        <ul>
+                            <li>设计 PVP 地图关卡结构，扩展地图玩法多样性，敏捷更新线上版本内容</li>
+                            <li>进行 PVE 模式的设计制作与线上维护，提升玩家在线时长，实现项目增收目标</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 项目展示 ===== -->
+    <section class="section" id="projects">
+        <div class="section-inner">
+            <div class="section-label reveal">项目</div>
+            <h2 class="section-title reveal reveal-delay-1">代表作品</h2>
+            <p class="section-desc reveal reveal-delay-2">覆盖射击与动作游戏的 PVP / PVPVE 关卡与模式设计。横向滑动查看更多。</p>
+            <div class="projects-scroll">
+
+                <div class="project-card reveal reveal-delay-1">
+                    <div class="project-visual"><img src="images/wzxy-gorge.jpg" alt="王者峡谷全图概念"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">王者荣耀世界 · ACT</div>
+                        <h3>吃鸡玩法 · 王者峡谷</h3>
+                        <p>吃鸡玩法主地图，负责整体地图 2D 概念设计，以及龙坑、红 buff 等核心 POI 的 2D layout 与 3D 场景制作，兼顾战斗乐趣与场景可信度。</p>
+                        <div class="project-tags">
+                            <span>关卡设计</span>
+                            <span>POI Layout</span>
+                            <span>3D 场景</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card reveal reveal-delay-2">
+                    <div class="project-visual"><img src="images/wzxy-4v4.jpg" alt="4V4关卡设计参考标尺"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">王者荣耀世界 · ACT</div>
+                        <h3>4V4 竞技玩法</h3>
+                        <p>设计 4V4 竞技玩法的模式规则与地图场景，建立关卡设计参考标尺，跟进生产制作与 CE 跑测，持续打磨玩家体验。</p>
+                        <div class="project-tags">
+                            <span>模式设计</span>
+                            <span>关卡标尺</span>
+                            <span>CE 打磨</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card reveal reveal-delay-3">
+                    <div class="project-visual"><img src="images/marvel-newyork.jpg" alt="漫威争锋纽约地图"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">漫威争锋 · TPS</div>
+                        <h3>PVP 地图 · 纽约 & 阿斯加德</h3>
+                        <p>负责两张全球化 PVP 地图的前期设计、白模搭建、跑测调整与生产制作，与海外团队协作，制定地图尺寸与模式参数标准。</p>
+                        <div class="project-tags">
+                            <span>PVP 地图</span>
+                            <span>白模搭建</span>
+                            <span>海外协作</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card reveal reveal-delay-1">
+                    <div class="project-visual"><img src="images/marvel-asgard.jpg" alt="漫威争锋阿斯加德地图"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">漫威争锋 · TPS</div>
+                        <h3>破碎工作流与效果研究</h3>
+                        <p>负责场景破碎相关玩法设计与关卡结构设计，制定破碎资源生产管线规范，并开展破碎效果与流程的专项研究。</p>
+                        <div class="project-tags">
+                            <span>破碎玩法</span>
+                            <span>管线规范</span>
+                            <span>效果研究</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card reveal reveal-delay-2">
+                    <div class="project-visual"><img src="images/wzxy-canglang.jpg" alt="苍狼营地POI 2D"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">王者荣耀世界 · ACT</div>
+                        <h3>吃鸡玩法 · 苍狼营地 POI</h3>
+                        <p>吃鸡玩法中的苍狼营地 POI 2D 设计，采用 10m/2m 网格标尺进行精细化空间布局，控制战斗节奏与动线分布。</p>
+                        <div class="project-tags">
+                            <span>POI 设计</span>
+                            <span>2D Layout</span>
+                            <span>网格标尺</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card reveal reveal-delay-3">
+                    <div class="project-visual"><img src="images/practice-shooting.jpg" alt="写实射击2D练习"></div>
+                    <div class="project-info">
+                        <div class="proj-meta">个人练手 · FPS</div>
+                        <h3>写实射击 2D 关卡练习</h3>
+                        <p>基于写实射击玩法的 2D 关卡设计练习，围绕掩体、动线与空间节奏展开，探索射击关卡的战术纵深与路线规划。</p>
+                        <div class="project-tags">
+                            <span>2D 练习</span>
+                            <span>射击关卡</span>
+                            <span>动线规划</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 设计方法论 ===== -->
+    <section class="section section-alt" id="method">
+        <div class="section-inner">
+            <div class="section-label reveal">方法论</div>
+            <h2 class="section-title reveal reveal-delay-1">设计经验总结</h2>
+            <p class="section-desc reveal reveal-delay-2">把项目中的思考沉淀为可复用的方法论。点击任意图片可放大查看。</p>
+            <div class="method-grid">
+
+                <div class="method-card reveal reveal-delay-1" data-img="images/method-3d-action.png">
+                    <div class="method-thumb"><img src="images/method-3d-action.png" alt="3D动作竞技游戏关卡设计"></div>
+                    <div class="method-body">
+                        <h3>3D 动作竞技游戏关卡设计</h3>
+                        <p>系统梳理 3D 动作竞技游戏与 PVP 射击游戏在关卡设计上的差异：从移动刀、阻敌与掩体、视野控制，到 3C 复杂度与美术物件密度，总结落地向的设计要点。</p>
+                    </div>
+                </div>
+
+                <div class="method-card reveal reveal-delay-2" data-img="images/method-loq.jpg">
+                    <div class="method-thumb"><img src="images/method-loq.jpg" alt="关卡LOQ流程"></div>
+                    <div class="method-body">
+                        <h3>关卡 LOQ 制作流程</h3>
+                        <p>所有关卡制作都需要遵循的 LOQ（Level Quality）流程，从概念到落地的分阶段质量标准与设计节点，保证关卡生产的可控与高可信度。</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 能力 ===== -->
+    <section class="section section-dark" id="skills">
+        <div class="section-inner">
+            <div class="section-label reveal">能力</div>
+            <h2 class="section-title reveal reveal-delay-1">专业能力</h2>
+            <p class="section-desc reveal reveal-delay-2">覆盖关卡与模式设计全流程，兼具体验直觉与工程落地能力。</p>
+            <div class="skills-grid">
+
+                <div class="skill-card reveal reveal-delay-1">
+                    <div class="skill-icon">🎯</div>
+                    <h4>PVP 关卡设计</h4>
+                    <p>精通射击与动作游戏的 PVP 关卡结构、模式规则与地图尺寸标准设计。</p>
+                </div>
+
+                <div class="skill-card reveal reveal-delay-2">
+                    <div class="skill-icon">🧭</div>
+                    <h4>模式与玩法设计</h4>
+                    <p>擅长原创玩法模式推演，制定模式参数标准，平衡战斗乐趣与可信度。</p>
+                </div>
+
+                <div class="skill-card reveal reveal-delay-3">
+                    <div class="skill-icon">📐</div>
+                    <h4>2D Layout / 3D 场景</h4>
+                    <p>从 2D 网格标尺 layout 到白模搭建、3D 场景制作与 POI 精细化设计。</p>
+                </div>
+
+                <div class="skill-card reveal reveal-delay-1">
+                    <div class="skill-icon">🔄</div>
+                    <h4>管线与规范</h4>
+                    <p>建立关卡生产规范与管线流程，制定破碎等资源生产标准，提升团队效率。</p>
+                </div>
+
+                <div class="skill-card reveal reveal-delay-2">
+                    <div class="skill-icon">📊</div>
+                    <h4>数据分析</h4>
+                    <p>善用 3D 热力图等方法分析玩家行为，以数据驱动关卡与动线优化。</p>
+                </div>
+
+                <div class="skill-card reveal reveal-delay-3">
+                    <div class="skill-icon">🛠️</div>
+                    <h4>工具链</h4>
+                    <p>熟练 Unity / UE4 / UE5 编辑器，以及 Maya、Photoshop、Houdini 等设计工具。</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 联系 ===== -->
+    <section class="section contact-section" id="contact">
+        <div class="section-inner">
+            <h2 class="section-title reveal">期待与你共事</h2>
+            <p class="section-desc reveal reveal-delay-1">如果你正在寻找资深关卡策划，或想聊聊合作机会，欢迎随时联系我。</p>
+            <div class="contact-cards reveal reveal-delay-2">
+                <a href="mailto:1833694039@qq.com" class="contact-card">
+                    <span class="icon">📧</span> 1833694039@qq.com
+                </a>
+                <a href="tel:18867109739" class="contact-card">
+                    <span class="icon">📱</span> 188 6710 9739
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 页脚 ===== -->
+    <footer class="footer">
+        Copyright &copy; 2026 朱国昊. All rights reserved.
+    </footer>
+
+    <!-- ===== Lightbox ===== -->
+    <div class="lightbox" id="lightbox">
+        <img src="" alt="预览">
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <script>
+        // 滚动渐入
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Lightbox 放大
+        const lightbox = document.getElementById('lightbox');
+        const lbImg = lightbox.querySelector('img');
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.addEventListener('click', () => {
+                lbImg.src = card.getAttribute('data-img');
+                lightbox.classList.add('open');
+            });
+        });
+        lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+    </script>
+
+</body>
+</html>
